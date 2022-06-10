@@ -36,6 +36,8 @@
   "devDependencies": {
     "@types/cli": "^0.11.20",
     "@types/nested-error-stacks": "^2.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+    "@typescript-eslint/parser": "^5.26.0",
     "cli": "^1.0.1",
     "prettier": "^2.6.2",
     "rimraf": "^3.0.2",
