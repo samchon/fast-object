@@ -1,5 +1,5 @@
 # Fast-Object
-Fast object creator, through `JSON.parse()`, but type safe.
+Fast object creator, via transforming to `JSON.parse()`, but type safe.
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/samchon/fast-object/blob/master/LICENSE)
 [![npm version](https://badge.fury.io/js/fast-object.svg)](https://www.npmjs.com/package/fast-object)
@@ -11,13 +11,13 @@ Fast object creator, through `JSON.parse()`, but type safe.
   - [Faster apps with JSON.parse (Chrome Dev Summit 2019)](https://www.youtube.com/watch?v=ff4fgQxPaO0)
   - [The cost of parsing JSON](https://v8.dev/blog/cost-of-javascript-2019#json)
 
-You know what? `JSON.parse()` is then literal construction, when only one-time constructed.
+You know what? `JSON.parse()` is faster than literal construction, when only one-time constructed.
 
-`fast-object` is a transformer library which converts a literal object construction to a `JSON.parse()` function call with string argument. Therefore, if you construct a literal object with `fast-object`, you can get benefit from type safety and perforamce tuning at the same time.
+`fast-object` is a transformer library which converts a literal object construction to a `JSON.parse()` function call expression with JSON string argument. Therefore, if you construct a literal object with `fast-object`, you can get benefit from type safety and perforamce tuning at the same time.
 
 Look at the below code, then you may understand how `fast-object` works.
 
-#### TypeScript source file
+#### `example.ts`
 ```typescript
 import create from "fast-object";
 
@@ -33,9 +33,9 @@ const member: IUser = create({
 });
 ```
 
-#### Compiled JavaScript file
+#### `example.js`
 ```js
-const member = JSON.parse(`{"id": 1, "account": "samchon", "name": "Jeongho Nam"}`);
+const member = JSON.parse("{\"id\":1,\"account\":\"samchon\",\"name\":\"Jeongho Nam\"}");
 ```
 
 
@@ -110,7 +110,7 @@ module.exports = {
 
 
 ## Features
-### Function
+### Default Function
 ```typescript
 export default function create<T>(input: T): T;
 ```
@@ -129,10 +129,10 @@ const member: IUser = create({
 });
 ```
 
-### Literal
+### Literal Only
 Use only constant literal values.
 
-`fast-object` is a transformer library which converts literal object construction to a `JSON.parse()` function call with string argument. Therefore, you have you only constant literal values in that object.
+`fast-object` is a transformer library which converts literal object construction to a `JSON.parse()` function call expression with JSON string argument. Therefore, you have you only constant literal values in that object.
 
 If you're using a variable value like below, `fast-object` will throw an exception.
 
@@ -147,31 +147,6 @@ const member: IUser = create({
 });
 ```
 
-### No Import
-No import statement, therefore no dependency.
-
-When you compile TypeScript file using `fast-object`, the import statement would be automatically erased, by the transformer. Therefore, don't worry about any dependency relationship when distributing your program.
-
-#### TypeScript source file
-```typescript
-import create from "fast-object";
-
-interface IUser {
-    id: number;
-    account: string;
-    name: string;
-}
-const member: IUser = create({
-    id: 1,
-    account: "samchon",
-    name: "Jeongho Nam",
-});
-```
-
-#### Compiled JavaScript file
-```js
-const member = JSON.parse(`{"id": 1, "account": "samchon", "name": "Jeongho Nam"}`);
-```
 
 
 
@@ -189,19 +164,21 @@ Runtime type checker, and 10x faster `JSON.stringify()` function, with only one 
 ```typescript
 import TSON from "typescript-json";
 
-TSON.assert<T>(input); // runtime type checker
+TSON.assert<T>(input); // runtime type checker throwing exception
+TSON.is<T>(input); // runtime type checker returning boolean
 TSON.stringify<T>(input); // 10x faster JSON.stringify()
+TSON.create<T>(input); // same with this fast-object
 ```
 
-`typescript-json` can check instance type in the runtime. Unlike other similar library `ajv` which requires complicate JSON schema definition, `typescript-json` requires only one line: `TSON.assert<T>(input)` or `TSON.is<T>(input)`.
+`typescript-json` is a transformer library providing JSON related functions.
 
-Also, `typescript-json` is a library which can boost up JSON string conversion speed about 10x times faster. Unlike other similar libraries like `ajv` or `fast-json-stringify` which requires complicate JSON schema definition,`typescript-json` requires only one line, too: `TSON.stringify<T>(input)`. 
+For an example, with `typescript-json`, **type check** in the **runtime** is possible. Boosting up **JSON** string conversion speed about **10x times faster** or creating is also possible. Important thing is, all of those features can be used by **only one line**. Besides, other similar libraries like `ajv` or `fast-json-stringify`, they require complicate JSON schema definition.
 
-Furthermore, `typescript-json` does not require any optimizer plan construction in the runtime. Therefore, `typescript-json` is about 10,000x times faster than `ajv` and `fast-json-stringify`, if compare only one-time JSON string conversion or validation.
+Furthermore, `typescript-json` does not require any optimizer plan construction in the runtime. Therefore, `typescript-json` is about **10,000x times faster** than `ajv` and `fast-json-stringify`, if compare only one-time JSON string conversion or validation.
 
-Only JSON string conversion time | Include optimizer planning time
+Only JSON string conversion time | Include optimization planning time
 ---------------------------------|------------------------------------
-![only-json-string-conversion](https://user-images.githubusercontent.com/13158709/172457566-d23100c2-808a-4544-a914-de92d8ec12b0.png) | ![include-optimizer-construction](https://user-images.githubusercontent.com/13158709/172457381-d8ccbb92-43a1-4c96-aae1-cdac7d2e03cd.png)
+![only-json-string-conversion-time](https://user-images.githubusercontent.com/13158709/172457566-d23100c2-808a-4544-a914-de92d8ec12b0.png) | ![include-optimization-planning-time](https://user-images.githubusercontent.com/13158709/172457381-d8ccbb92-43a1-4c96-aae1-cdac7d2e03cd.png)
 
 ### Nestia
 https://github.com/samchon/nestia
